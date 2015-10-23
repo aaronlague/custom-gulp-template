@@ -7,6 +7,7 @@ var gulp = require('gulp'),
 	uglify = require('gulp-uglify'),
 	cssmin = require('gulp-cssmin'),
 	sourcemaps = require('gulp-sourcemaps'),
+	inject = require('gulp-inject'),
 	browsersync = require('browser-sync').create();
 
 var reload = browsersync.reload;
@@ -27,6 +28,16 @@ var config = {
             src:  ["src/css/**/*.css"],
             dest: "build/css"
         },
+
+        custom_css: {
+        	src:  ["src/custom_css/**/*.css"],
+            dest: "build/custom_css"
+        },
+
+        custom_js: {
+        	src:  ["src/custom_js/**/*.css"],
+            dest: "build/custom_js"
+        }
     }
 }
 
@@ -65,9 +76,20 @@ gulp.task('browser-sync', function() {
 });
 
 
+gulp.task('inject-custom-styles-scripts', function () {
+  var target = gulp.src('./src/**/*.html');  
+ 
+  return target.pipe(inject(gulp.src(['./src/custom_js/*.js', './src/custom_css/*.css'], {read: false}), {relative: true}))
+    .pipe(gulp.dest('./src'));
+});
+
+
 gulp.task("serve", ["browser-sync"], function(){
 	gulp.watch(config.paths.html.src, ["html", browsersync.reload]);
 	gulp.watch(config.paths.css.src, ["css", browsersync.reload]);
 });
+
+
+
 
 gulp.task("build", ["html", "scripts", "css"]);
